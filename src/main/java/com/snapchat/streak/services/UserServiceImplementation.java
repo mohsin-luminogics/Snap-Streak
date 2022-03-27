@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -63,13 +64,17 @@ public class UserServiceImplementation implements UserService {
     @Override
     public List<User> fetchUnFriendUsers(String username) {
         ArrayList<User> users=(ArrayList<User>) userDao.findAll();
-        List<User> loginUser=userDao.findByUsername(username);
-        List<Friend> friendList=loginUser.get(0).getFriendsList();
-        users.removeIf(user -> user.getUsername().equals(loginUser.get(0).getUsername()));
-        if(friendList!=null){
-            for(Friend friend:friendList){
-                users.removeIf(user -> user.getUsername().equals(friend.getName()));
+        try {
+            List<User> loginUser=userDao.findByUsername(username);
+            List<Friend> friendList=loginUser.get(0).getFriendsList();
+            users.removeIf(user -> user.getUsername().equals(loginUser.get(0).getUsername()));
+            if(friendList!=null){
+                for(Friend friend:friendList){
+                    users.removeIf(user -> user.getUsername().equals(friend.getName()));
+                }
             }
+        } catch (Exception n) {
+            n.printStackTrace();
         }
         return users;
     }
@@ -80,20 +85,26 @@ public class UserServiceImplementation implements UserService {
         User user=findUser.get(0);
         List<Friend> friendList=user.getFriendsList() !=null ?user.getFriendsList():new ArrayList<>();
         ArrayList<String> names=user.getSendByStreakList() !=null ?(ArrayList<String>) user.getSendByStreakList(): new ArrayList<>();
-        int count=0;
-        if(friendList.size()!=0){
-            for(Friend friend: friendList){
-                if(names.size()!=0){
-                    if(friend.getName().equals(names.get(count))){
-                        if(friend.getStreak()!=null&&friend.getStreak().isEmpty()){
-                            names.remove(friend.getName());
-                            userDao.save(user);
+        try {
+            List<String> removeList=new ArrayList<>();
+            if(friendList.size()!=0){
+                if(names.size()>0){
+                    for(String name:names){
+                        List<Friend> friendList1=friendList.stream().filter(friend -> friend.getName().equals(name))
+                                .collect(Collectors.toList());
+                        if(friendList1.get(0).getStreak()!=null&&friendList1.get(0).getStreak().isEmpty()){
+                            removeList.add(friendList1.get(0).getName());
                         }
                     }
+                    if(removeList.size()>0){
+                        names.removeAll(removeList);
+                    }
                 }
-                count++;
             }
+        } catch (Exception n) {
+            n.printStackTrace();
         }
+
         return names;
     }
 }
