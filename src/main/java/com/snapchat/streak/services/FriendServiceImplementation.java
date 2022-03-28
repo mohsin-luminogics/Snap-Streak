@@ -278,9 +278,8 @@ public class FriendServiceImplementation implements FriendService {
             }
                 if (commonData != null) {
                     if(activeUserFriend.getStartPresentTime()!=null){
-                    if(!firstTime && currentTime.toString().split("T")[0].compareTo(
-                            activeUserFriend.getStartPresentTime().split("T")[0]
-                    )!=0){
+                    if(!firstTime && activeUserInFriendList.getStartPresentTime().compareTo(
+                            activeUserFriend.getEndPresentTime())>0){
                         activeUserFriend.setSendStreak(false);
                         activeUserFriend.setSendCount(0);
                     }
