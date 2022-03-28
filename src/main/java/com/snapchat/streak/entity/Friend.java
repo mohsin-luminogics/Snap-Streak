@@ -12,11 +12,12 @@ public class Friend {
     private String startPresentTime;
     private String endPresentTime;
     private String nextStartTime;
+    private int sendCount;
 
     public Friend() {
     }
 
-    public Friend(String name, List<Streak> streak, int uniqueId, boolean sendStreak, String startPresentTime, String endPresentTime, String nextStartTime) {
+    public Friend(String name, List<Streak> streak, int uniqueId, boolean sendStreak, String startPresentTime, String endPresentTime, String nextStartTime, int sendCount) {
         this.name = name;
         this.streak = streak;
         this.uniqueId = uniqueId;
@@ -24,6 +25,7 @@ public class Friend {
         this.startPresentTime = startPresentTime;
         this.endPresentTime = endPresentTime;
         this.nextStartTime = nextStartTime;
+        this.sendCount = sendCount;
     }
 
     public String getName() {
@@ -82,6 +84,14 @@ public class Friend {
         this.nextStartTime = nextStartTime;
     }
 
+    public int getSendCount() {
+        return sendCount;
+    }
+
+    public void setSendCount(int sendCount) {
+        this.sendCount = sendCount;
+    }
+
     @Override
     public String toString() {
         return "Friend{" +
@@ -89,9 +99,10 @@ public class Friend {
                 ", streak=" + streak +
                 ", uniqueId=" + uniqueId +
                 ", sendStreak=" + sendStreak +
-                ", startPresentTime=" + startPresentTime +
-                ", endPresentTime=" + endPresentTime +
-                ", nextStartTime=" + nextStartTime +
+                ", startPresentTime='" + startPresentTime + '\'' +
+                ", endPresentTime='" + endPresentTime + '\'' +
+                ", nextStartTime='" + nextStartTime + '\'' +
+                ", sendCount=" + sendCount +
                 '}';
     }
 }

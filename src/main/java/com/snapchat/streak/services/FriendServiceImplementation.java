@@ -25,6 +25,7 @@ public class FriendServiceImplementation implements FriendService {
     private boolean firstTime=false;
     private int firstDay=0;
     private int secondDay=0;
+    private String date="";
 
     public FriendServiceImplementation() {
         this.friend = new Friend();
@@ -263,7 +264,7 @@ public class FriendServiceImplementation implements FriendService {
     private void streakTimeImplementationAndChecking(CommonData commonData,Friend activeUserInFriendList,int randomNumber,Friend activeUserFriend){
         try {
             LocalDateTime currentTime = LocalDateTime.now();
-            if (!activeUserInFriendList.isSendStreak() || currentTime.toString().compareTo(activeUserInFriendList.getEndPresentTime()) > 0) {
+            if (!activeUserInFriendList.isSendStreak()) {
                 activeUserInFriendList.setStartPresentTime(LocalDateTime.now().toString());
                 activeUserInFriendList.setEndPresentTime(LocalDateTime.now().plusDays(1).toString());
                 activeUserInFriendList.setNextStartTime(LocalDateTime.now().plusDays(2).toString());
@@ -275,36 +276,59 @@ public class FriendServiceImplementation implements FriendService {
                     commonDataDao.save(commonData);
                 }
             }
-            if (activeUserFriend.isSendStreak() && activeUserInFriendList.isSendStreak()) {
                 if (commonData != null) {
+                    if(activeUserFriend.getStartPresentTime()!=null){
+                    if(!firstTime && currentTime.toString().split("T")[0].compareTo(
+                            activeUserFriend.getStartPresentTime().split("T")[0]
+                    )!=0){
+                        activeUserFriend.setSendStreak(false);
+                        activeUserFriend.setSendCount(0);
+                    }
+                    }
                     if (currentTime.toString().compareTo(activeUserInFriendList.getStartPresentTime()) >= 0&&
                             currentTime.toString().compareTo(activeUserInFriendList.getEndPresentTime()) <= 0) {
-
-                        if(commonData.getStreakCount()==0 && !firstTime && firstDay==0){
-                            commonData.setStreakCount(1);
-                            firstTime=true;
-                            firstDay=1;
-                            secondDay=0;
+                        if(currentTime.toString().split("T")[0].compareTo(date)==0){
+                            activeUserInFriendList.setSendCount(1);
+                        }else{
+                            date=activeUserInFriendList.getStartPresentTime().split("T")[0];
+                            activeUserInFriendList.setSendCount(1);
+                            activeUserFriend.setSendCount(0);
                         }
-                        if(commonData.getStreakCount()==0 && firstTime && firstDay==0){
-                            commonData.setStreakCount(commonData.getStreakCount() + 1);
-                            activeUserInFriendList.setStartPresentTime(LocalDateTime.now().toString());
-                            activeUserInFriendList.setEndPresentTime(LocalDateTime.now().plusDays(1).toString());
-                            activeUserInFriendList.setNextStartTime(LocalDateTime.now().plusDays(2).toString());
-                            firstDay=1;
-                            secondDay=0;
+                        if(activeUserFriend.getSendCount()==1 && activeUserInFriendList.getSendCount()==1){
+                            if(commonData.getStreakCount()==0 && !firstTime && firstDay==0){
+                                commonData.setStreakCount(1);
+                                firstTime=true;
+                                firstDay=1;
+                                secondDay=0;
+                            }
+                            if(commonData.getStreakCount()==0 && firstTime && firstDay==0){
+                                commonData.setStreakCount(commonData.getStreakCount() + 1);
+                                activeUserInFriendList.setStartPresentTime(LocalDateTime.now().toString());
+                                activeUserInFriendList.setEndPresentTime(LocalDateTime.now().plusDays(1).toString());
+                                activeUserInFriendList.setNextStartTime(LocalDateTime.now().plusDays(2).toString());
+                                firstDay=1;
+                                secondDay=0;
+                            }
                         }
 
                     } else if (currentTime.toString().compareTo(activeUserInFriendList.getEndPresentTime()) > 0 &&
                             currentTime.toString().compareTo(activeUserInFriendList.getNextStartTime()) <= 0 ) {
-
-                        if(commonData.getStreakCount()>0 && secondDay==0){
-                            commonData.setStreakCount(commonData.getStreakCount() + 1);
-                            activeUserInFriendList.setStartPresentTime(LocalDateTime.now().toString());
-                            activeUserInFriendList.setEndPresentTime(LocalDateTime.now().plusDays(1).toString());
-                            activeUserInFriendList.setNextStartTime(LocalDateTime.now().plusDays(2).toString());
-                            secondDay=1;
-                            firstDay=0;
+                        if(currentTime.toString().split("T")[0].compareTo(date)==0){
+                            activeUserInFriendList.setSendCount(1);
+                        }else{
+                            date=activeUserInFriendList.getEndPresentTime().split("T")[0];
+                            activeUserFriend.setSendCount(0);
+                            activeUserInFriendList.setSendCount(1);
+                        }
+                        if(activeUserFriend.getSendCount()==1 && activeUserInFriendList.getSendCount()==1){
+                            if(commonData.getStreakCount()>0 && secondDay==0){
+                                commonData.setStreakCount(commonData.getStreakCount() + 1);
+                                activeUserInFriendList.setStartPresentTime(LocalDateTime.now().toString());
+                                activeUserInFriendList.setEndPresentTime(LocalDateTime.now().plusDays(1).toString());
+                                activeUserInFriendList.setNextStartTime(LocalDateTime.now().plusDays(2).toString());
+                                secondDay=1;
+                                firstDay=0;
+                            }
                         }
                     } else if (currentTime.toString().compareTo(activeUserInFriendList.getNextStartTime()) > 0) {
                         activeUserInFriendList.setStartPresentTime(LocalDateTime.now().toString());
@@ -314,10 +338,13 @@ public class FriendServiceImplementation implements FriendService {
                         firstDay=0;
                         firstTime=false;
                         secondDay=0;
+                        activeUserFriend.setSendCount(0);
+                        activeUserInFriendList.setSendCount(1);
+                        date=currentTime.toString().split("T")[0];
+                        activeUserFriend.setSendStreak(false);
                     }
                     commonDataDao.save(commonData);
                 }
-            }
         } catch (Exception n) {
             n.printStackTrace();
         }
