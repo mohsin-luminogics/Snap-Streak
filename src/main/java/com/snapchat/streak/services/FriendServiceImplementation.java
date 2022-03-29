@@ -286,7 +286,8 @@ public class FriendServiceImplementation implements FriendService {
                     }
                     if (currentTime.toString().compareTo(activeUserInFriendList.getStartPresentTime()) >= 0&&
                             currentTime.toString().compareTo(activeUserInFriendList.getEndPresentTime()) <= 0) {
-                        if(currentTime.toString().split("T")[0].compareTo(date)==0){
+                        if(currentTime.toString().split("T")[0].compareTo(date)==0 ||
+                        activeUserInFriendList.getStartPresentTime().compareTo(activeUserFriend.getEndPresentTime())<0){
                             activeUserInFriendList.setSendCount(1);
                         }else{
                             date=activeUserInFriendList.getStartPresentTime().split("T")[0];
@@ -312,7 +313,8 @@ public class FriendServiceImplementation implements FriendService {
 
                     } else if (currentTime.toString().compareTo(activeUserInFriendList.getEndPresentTime()) > 0 &&
                             currentTime.toString().compareTo(activeUserInFriendList.getNextStartTime()) <= 0 ) {
-                        if(currentTime.toString().split("T")[0].compareTo(date)==0){
+                        if(currentTime.toString().split("T")[0].compareTo(date)==0 ||
+                                activeUserInFriendList.getEndPresentTime().compareTo(activeUserFriend.getNextStartTime())<0){
                             activeUserInFriendList.setSendCount(1);
                         }else{
                             date=activeUserInFriendList.getEndPresentTime().split("T")[0];
