@@ -102,9 +102,9 @@ public class FriendServiceImplementation implements FriendService {
     public boolean sendStreak(String streakMsg, List<String> myFriends, String username) {
         try {
             Random rand = new Random(LocalDateTime.now().getSecond());
-            int randomNumber = rand.nextInt();
             List<User> activeUser = userDao.findByUsername(username);
             for (String friend : myFriends) {
+                int randomNumber=rand.nextInt();
                 Friend activeUserFriend = getActiveUserFriend(activeUser, friend);
                 User tempActiveUser = setUniqueIdOfActiveUser(activeUser, activeUserFriend, randomNumber);
                 User temp = setSendByStreakList(friend, tempActiveUser);
